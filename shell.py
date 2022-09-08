@@ -26,8 +26,8 @@ plms = "PLMS"
 kwargs_txt2img = OrderedDict(
     prompt="",
     negative_prompt="",
-    steps=20,
-    sampler_index=0,
+    steps=50,
+    sampler_index=1,
     restore_faces=False,
     tiling=False,
     n_iter=9,
@@ -121,7 +121,7 @@ def sampler_index(new_value: Optional[int] = None) -> Optional[int]:
 
 def sampler_name(new_value: Optional[str] = None) -> Optional[str]:
     """Return the sampler name or set by providing a value."""
-    return _sampler_name_to_index(sampler_index(new_value))
+    return sampler_index(_sampler_name_to_index(new_value))
 
 
 def restore_faces(new_value: Optional[bool] = None) -> Optional[bool]:
