@@ -57,7 +57,8 @@ def _process_jobs():
     while not shell_exited:
         if job_queue:
             args = job_queue.pop(0)
-            webui.modules.txt2img.txt2img(*args)
+            func = webui.wrap_gradio_gpu_call(webui.modules.txt2img.txt2img)
+            func(*args)
         else:
             sleep(1)
 
