@@ -6,6 +6,7 @@ IPython shell frontend for generating images with Stable Diffusion.
 * txt2img
 * Full IPython functionality during use.
 * Prompt queuing.
+* Negative prompts.
 * Separate terminals for IPython and progress prints.
 
 ## Example Use
