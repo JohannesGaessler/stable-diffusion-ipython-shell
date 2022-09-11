@@ -14,7 +14,7 @@ IPython shell frontend for generating images with Stable Diffusion.
 p "E=mc2"  # set prompt to E=mc2
 q  # queue txt2img job
 i  # print current parameter values
-ni 50  # set number of iterations to 5
+ni 50  # set number of iterations to 50
 sn lms  # set sampler name to LMS
 se 42  # set seed to 42
 qp "r/aww"  # queue txt2img job with prompt "r/aww"
