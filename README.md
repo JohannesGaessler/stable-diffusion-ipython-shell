@@ -11,6 +11,7 @@ IPython shell frontend for generating images with Stable Diffusion.
 
 ## Example Use
 ```
+i use  # print usage instructions
 p "E=mc2"  # set prompt to E=mc2
 q  # queue txt2img job
 i  # print current parameter values
