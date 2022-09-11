@@ -90,6 +90,16 @@ def negative_prompt(new_value: Optional[str] = None) -> Optional[str]:
     return _set_or_return("negative_prompt", new_value)
 
 
+def prompt_style(new_value: Optional[str] = None) -> Optional[str]:
+    """Return the prompt style or set by providing a value."""
+    if new_value is not None and new_value not in webui.modules.shared.prompt_styles:
+        raise ValueError(
+            f"Unknown prompt style: {new_value}. "
+            f"Available: {list(webui.modules.shared.prompt_styles.keys())}"
+        )
+    return _set_or_return("prompt_style", new_value)
+
+
 def steps(new_value: Optional[int] = None) -> Optional[int]:
     """Return the number of steps or set by providing a value."""
     if new_value is not None:
@@ -166,6 +176,34 @@ def seed(new_value: Optional[int] = None) -> Optional[int]:
     return _set_or_return("seed", new_value)
 
 
+def subseed(new_value: Optional[int] = None) -> Optional[int]:
+    """Return the subseed used for variation or set by providing a value."""
+    if new_value is not None:
+        new_value = int(new_value)
+    return _set_or_return("subseed", new_value)
+
+
+def subseed_strength(new_value: Optional[float] = None) -> Optional[float]:
+    """Return the subseed strength used for variation or set by providing a value."""
+    if new_value is not None:
+        new_value = int(new_value)
+    return _set_or_return("subseed_strength", new_value)
+
+
+def seed_resize_from_h(new_value: Optional[int] = None) -> Optional[int]:
+    """Return the height used for generating initial noise or set by providing a value."""
+    if new_value is not None:
+        new_value = int(new_value)
+    return _set_or_return("seed_resize_from_h", new_value)
+
+
+def seed_resize_from_w(new_value: Optional[int] = None) -> Optional[int]:
+    """Return the width used for generating initial noise or set by providing a value."""
+    if new_value is not None:
+        new_value = int(new_value)
+    return _set_or_return("seed_resize_from_w", new_value)
+
+
 def height(new_value: Optional[int] = None) -> Optional[int]:
     """Return the image height or set by providing a value."""
     if new_value is not None:
@@ -207,6 +245,8 @@ def info(subject=par):
         print("Usable functions:")
         print(f"p, prompt: {prompt.__doc__}")
         print(f"np, negative_prompt: {negative_prompt.__doc__}")
+        print(f"ps, prompt_style: {prompt_style.__doc__}")
+        print(f"Available prompt styles: {list(webui.modules.shared.prompt_styles.keys())}")
         print(f"st, steps: {steps.__doc__}")
         print(f"sn, sampler_name: {sampler_name.__doc__}")
         print(f"rf, restore_faces: {restore_faces.__doc__}")
@@ -214,8 +254,12 @@ def info(subject=par):
         print(f"bs, batch_size: {batch_size.__doc__}")
         print(f"cfg, cfg_scale: {cfg_scale.__doc__}")
         print(f"se, seed: {seed.__doc__}")
+        print(f"ss, subseed: {subseed.__doc__}")
+        print(f"sst, subseed_strength: {subseed_strength.__doc__}")
+        print(f"srfh, seed_resize_from_h: {seed_resize_from_h.__doc__}")
+        print(f"srfw, seed_resize_from_w: {seed_resize_from_w.__doc__}")
         print(f"h, height: {height.__doc__}")
-        print(f"w, width: {height.__doc__}")
+        print(f"w, width: {width.__doc__}")
         print(f"q, queue: {queue.__doc__}")
         print(f"qp, queue_prompt: {queue_prompt.__doc__}")
         print("i, i par, info, info par: Print current parameter values.")
@@ -223,6 +267,7 @@ def info(subject=par):
 
 
 p = prompt
+ps = prompt_style
 np = negative_prompt
 st = steps
 sn = sampler_name
@@ -231,6 +276,10 @@ ni = n_iter
 bs = batch_size
 cfg = cfg_scale
 se = seed
+ss = subseed
+sst = subseed_strength
+srfh = seed_resize_from_h
+srfw = seed_resize_from_w
 h = height
 w = width
 q = queue
