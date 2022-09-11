@@ -3,10 +3,10 @@ IPython shell frontend for generating images with Stable Diffusion.
 
 ## Features
 
-* txt2img
+* txt2img with improvements from [webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui), e.g. negative prompts and variation.
 * Full IPython functionality during use.
 * Prompt queuing.
-* Negative prompts.
+* Saving/loading settings to/from config files during use.
 * Separate terminals for IPython and progress prints.
 
 ## Example Use
@@ -18,6 +18,8 @@ ni 50  # set number of iterations to 5
 sn lms  # set sampler name to LMS
 se 42  # set seed to 42
 qp "r/aww"  # queue txt2img job with prompt "r/aww"
+save "lms50"  # save current settings
+load ui_config  # restore defaults from webui
 qp "bronze statue"  # queue txt2img job with prompt "bronze statue"
 ```
 
