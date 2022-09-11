@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 from collections import OrderedDict
 from threading import Thread
 from copy import deepcopy
@@ -9,11 +10,13 @@ import IPython
 from traitlets.config import Config
 from time import sleep
 import yaml
+import json
 
 import webui
 
 par = "par"
 use = "use"
+ui_config = "ui_config"
 euler_a = "Euler a"
 euler = "Euler"
 lms = "LMS"
@@ -23,6 +26,8 @@ dpm2_a = "DPM2 a"
 ddim = "DDIM"
 plms = "PLMS"
 
+config_dir = "configs/ipy_shell"
+
 kwargs_txt2img = OrderedDict(
     prompt="",
     negative_prompt="",
@@ -31,17 +36,18 @@ kwargs_txt2img = OrderedDict(
     sampler_index=1,
     restore_faces=False,
     tiling=False,
-    n_iter=9,
+    n_iter=1,
     batch_size=1,
     cfg_scale=10.0,
-    seed=42,
-    subseed=0,
+    seed=-1,
+    subseed=-1,
     subseed_strength=0.0,
     seed_resize_from_h=0,
     seed_resize_from_w=0,
     height=512,
     width=512,
 )
+
 
 try:
     with open("/var/tmp/stable-diffusion-ipython-shell-info", encoding="ascii") as f:
@@ -218,6 +224,28 @@ def width(new_value: Optional[int] = None) -> Optional[int]:
     return _set_or_return("width", new_value)
 
 
+def _load_kwargs_from_ui_config():
+    ui_config_file = os.path.join(webui.modules.paths.script_path, 'ui-config.json')
+    if not os.path.exists(ui_config_file):
+        print(f"Did not find a config file under {ui_config_file} to load values from.")
+        return
+    with open(ui_config_file, "r", encoding="utf8") as f:
+        ui_config = json.load(f)
+    steps(ui_config["txt2img/Sampling Steps/value"])
+    sampler_name(ui_config["txt2img/Sampling method/value"])
+    n_iter(ui_config["txt2img/Batch count/value"])
+    batch_size(ui_config["txt2img/Batch size/value"])
+    cfg_scale(ui_config["txt2img/CFG Scale/value"])
+    height(ui_config["txt2img/Height/value"])
+    width(ui_config["txt2img/Width/value"])
+    subseed_strength(ui_config["txt2img/Variation strength/value"])
+    seed_resize_from_h(ui_config["txt2img/Resize seed from height/value"])
+    seed_resize_from_w(ui_config["txt2img/Resize seed from width/value"])
+
+
+_load_kwargs_from_ui_config()
+
+
 def queue(**temporary_kwargs) -> None:
     """Queue a job with the current parameters. Provide kwargs to override current parameters for this job only."""
     kwargs_copy = deepcopy(kwargs_txt2img)
@@ -232,17 +260,51 @@ def queue_prompt(prompt: str) -> None:
     queue(prompt=prompt)
 
 
+def save(filename="tmp"):
+    """Save current parameters to specified file, 'tmp' by default."""
+    filename = str(filename)
+    if not filename.endswith((".yaml", ".yml")):
+        filename += ".yaml"
+    os.makedirs(config_dir, exist_ok=True)
+    with open(os.path.join(config_dir, filename), "w", encoding="utf8") as f:
+        yaml.dump(dict(kwargs_txt2img), f, width=100000, allow_unicode=True, encoding="utf8")
+
+
+def load(source="tmp"):
+    """Load parameters from specified file, 'tmp' by default."""
+    if source == ui_config:
+        _load_kwargs_from_ui_config()
+        return
+    source = str(source)
+    file_path = os.path.join(config_dir, source)
+    if os.path.exists(file_path):
+        pass
+    elif os.path.exists(file_path + ".yaml"):
+        file_path += ".yaml"
+    elif os.path.exists(file_path + ".yml"):
+        file_path += ".yml"
+    else:
+        raise ValueError(f"Did not find a config file {source} or {source}.yaml in {config_dir}.")
+    with open(file_path, "r", encoding="utf8") as f:
+        new_kwargs = yaml.safe_load(f)
+    for key in kwargs_txt2img.keys():
+        if key in new_kwargs and key in kwargs_txt2img:
+            kwargs_txt2img[key] = new_kwargs.pop(key)
+    if new_kwargs:
+        print(f"Warning: unused kwargs when loading in {file_path}: {new_kwargs}")
+
+
 def info(subject=par):
     """Print the current parameter values or usage instructions."""
     if subject == par:
-        print("Parameter values:")
+        print("=== Parameter Values ===")
         for key, value in kwargs_txt2img.items():
             if key == "sampler_index":
                 key = "sampler_name"
                 value = _sampler_index_to_name(value)
             print(f"{key}: {value}")
     elif subject == use:
-        print("Usable functions:")
+        print("=== Usable Functions ===")
         print(f"p, prompt: {prompt.__doc__}")
         print(f"np, negative_prompt: {negative_prompt.__doc__}")
         print(f"ps, prompt_style: {prompt_style.__doc__}")
@@ -262,6 +324,8 @@ def info(subject=par):
         print(f"w, width: {width.__doc__}")
         print(f"q, queue: {queue.__doc__}")
         print(f"qp, queue_prompt: {queue_prompt.__doc__}")
+        print(f"save: {save.__doc__}")
+        print(f"load: {load.__doc__}")
         print("i, i par, info, info par: Print current parameter values.")
         print("i use, info use: Print usage instructions.")
 
