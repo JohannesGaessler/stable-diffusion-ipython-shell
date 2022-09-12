@@ -191,8 +191,6 @@ def subseed(new_value: Optional[int] = None) -> Optional[int]:
 
 def subseed_strength(new_value: Optional[float] = None) -> Optional[float]:
     """Return the subseed strength used for variation or set by providing a value."""
-    if new_value is not None:
-        new_value = int(new_value)
     return _set_or_return("subseed_strength", new_value)
 
 
